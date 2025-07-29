@@ -56,32 +56,40 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
-}
 
-/*
-  The default border color has changed to `currentColor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
+    /* Restaurant Theme Colors */
+    --primary-50: #fff7ed;
+    --primary-100: #ffedd5;
+    --primary-200: #fed7aa;
+    --primary-300: #fdba74;
+    --primary-400: #fb923c;
+    --primary-500: #f97316;
+    --primary-600: #ea580c;
+    --primary-700: #c2410c;
+    --primary-800: #9a3412;
+    --primary-900: #7c2d12;
 
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-@layer base {
-    *,
-    ::after,
-    ::before,
-    ::backdrop,
-    ::file-selector-button {
-        border-color: var(--color-gray-200, currentColor);
-    }
-}
+    --secondary-50: #f0fdf4;
+    --secondary-100: #dcfce7;
+    --secondary-200: #bbf7d0;
+    --secondary-300: #86efac;
+    --secondary-400: #4ade80;
+    --secondary-500: #22c55e;
+    --secondary-600: #16a34a;
+    --secondary-700: #15803d;
+    --secondary-800: #166534;
+    --secondary-900: #14532d;
 
-@layer utilities {
-    body,
-    html {
-        --font-sans:
-            'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-    }
+    --accent-50: #fef2f2;
+    --accent-100: #fee2e2;
+    --accent-200: #fecaca;
+    --accent-300: #fca5a5;
+    --accent-400: #f87171;
+    --accent-500: #ef4444;
+    --accent-600: #dc2626;
+    --accent-700: #b91c1c;
+    --accent-800: #991b1b;
+    --accent-900: #7f1d1d;
 }
 
 :root {
@@ -158,10 +166,201 @@
 }
 
 @layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+@layer utilities {
+    body,
+    html {
+        --font-sans:
+            'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    }
+}
+
+@layer base {
     * {
         @apply border-border outline-ring/50;
     }
     body {
         @apply bg-background text-foreground;
     }
+}
+
+/* ===== PANDABURGER RESTAURANT THEME ===== */
+
+/* Restaurant Card Styles */
+.restaurant-card {
+    @apply bg-gradient-to-br from-white to-orange-50 dark:from-gray-800 dark:to-orange-900/20;
+    @apply border border-orange-200 dark:border-orange-800;
+    @apply shadow-lg hover:shadow-xl;
+    @apply transition-all duration-300;
+    @apply rounded-2xl overflow-hidden;
+}
+
+.restaurant-card:hover {
+    @apply transform -translate-y-1;
+    @apply border-orange-300 dark:border-orange-700;
+}
+
+/* Food Category Badge */
+.food-badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+    @apply bg-gradient-to-r from-orange-100 to-orange-200 dark:from-orange-900/50 dark:to-orange-800/50;
+    @apply text-orange-800 dark:text-orange-200;
+    @apply border border-orange-200 dark:border-orange-700;
+}
+
+/* Price Display */
+.price-display {
+    @apply text-2xl font-bold;
+    @apply bg-gradient-to-r from-green-600 to-green-500;
+    @apply bg-clip-text text-transparent;
+}
+
+/* Restaurant Button */
+.btn-restaurant {
+    @apply bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700;
+    @apply text-white font-semibold py-3 px-6 rounded-xl;
+    @apply shadow-lg hover:shadow-xl;
+    @apply transition-all duration-300;
+    @apply transform hover:scale-105;
+}
+
+.btn-restaurant-secondary {
+    @apply bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600;
+    @apply text-gray-700 dark:text-gray-300 font-semibold py-3 px-6 rounded-xl;
+    @apply border border-gray-300 dark:border-gray-600;
+    @apply shadow-lg hover:shadow-xl;
+    @apply transition-all duration-300;
+    @apply transform hover:scale-105;
+}
+
+/* Restaurant Input */
+.input-restaurant {
+    @apply w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl;
+    @apply bg-white dark:bg-gray-800 text-gray-900 dark:text-white;
+    @apply focus:ring-2 focus:ring-orange-500 focus:border-orange-500;
+    @apply transition-all duration-200;
+    @apply shadow-sm;
+}
+
+/* Restaurant Sidebar */
+.sidebar-restaurant {
+    @apply bg-gradient-to-b from-orange-50 to-orange-100 dark:from-gray-900 dark:to-orange-900/20;
+    @apply border-r border-orange-200 dark:border-orange-800;
+}
+
+/* Food Image Container */
+.food-image-container {
+    @apply relative overflow-hidden rounded-xl;
+    @apply bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/30 dark:to-orange-800/30;
+}
+
+/* Restaurant Header */
+.header-restaurant {
+    @apply bg-gradient-to-r from-orange-500 to-orange-600;
+    @apply text-white shadow-lg;
+}
+
+/* ===== ANIMATIONS ===== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(249, 115, 22, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(249, 115, 22, 0.8);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ===== CUSTOM SCROLLBAR ===== */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--neutral-100);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-400);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-500);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+
+@media (max-width: 768px) {
+    .restaurant-card {
+        @apply rounded-xl;
+    }
+    
+    .btn-restaurant {
+        @apply py-2 px-4 text-sm;
+    }
+}
+
+/* ===== DARK MODE ENHANCEMENTS ===== */
+
+.dark .restaurant-card {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d1b0f 100%);
+}
+
+.dark .food-badge {
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.2) 0%, rgba(249, 115, 22, 0.1) 100%);
+}
+
+/* ===== LOADING STATES ===== */
+
+.loading-skeleton {
+    @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded;
+}
+
+/* ===== FOCUS STATES ===== */
+
+.focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2;
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+.text-gradient {
+    @apply bg-gradient-to-r from-orange-600 to-orange-500 bg-clip-text text-transparent;
+}
+
+.bg-gradient-restaurant {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+}
+
+.border-gradient {
+    border-image: linear-gradient(135deg, #f97316, #ea580c) 1;
 }
