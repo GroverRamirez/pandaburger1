@@ -75,13 +75,13 @@
           </span>
         </div>
         
-        <button
-          @click="$emit('view', producto)"
-          class="btn-restaurant-secondary text-sm py-2 px-4"
+        <Link
+          :href="route('productos.show', producto.id)"
+          class="btn-restaurant-secondary text-sm py-2 px-4 inline-flex items-center"
         >
           Ver detalles
           <ArrowRight class="w-4 h-4 ml-1" />
-        </button>
+        </Link>
       </div>
 
       <!-- Additional Info -->
@@ -102,6 +102,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { Link } from '@inertiajs/vue3'
 import { Package, Edit, Trash, ArrowRight } from 'lucide-vue-next'
 import type { Producto } from '@/types/productos'
 
@@ -110,7 +111,6 @@ interface Props {
 }
 
 interface Emits {
-  (e: 'view', producto: Producto): void
   (e: 'edit', producto: Producto): void
   (e: 'delete', producto: Producto): void
 }
