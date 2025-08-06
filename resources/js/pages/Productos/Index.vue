@@ -103,7 +103,9 @@
               v-for="producto in paginatedProductos"
               :key="producto.id"
               :producto="producto"
+              @edit="editProduct"
               @delete="confirmDelete"
+              @upload-image="openUploadModal"
             />
           </div>
 
@@ -287,6 +289,57 @@
         </div>
       </div>
     </div>
+
+    <!-- Upload Image Modal -->
+    <div
+      v-if="showUploadModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      @click="showUploadModal = false"
+    >
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl"
+        @click.stop
+      >
+        <div class="flex items-center space-x-3 mb-4">
+          <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center">
+            <Upload class="w-6 h-6 text-blue-500" />
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+              Subir Imagen
+            </h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              Sube una imagen para {{ productoToUpload?.nombre }}
+            </p>
+          </div>
+        </div>
+        
+        <div class="space-y-4">
+          <ImageUpload
+            v-model="productoToUploadImageUrl"
+            :alt="productoToUpload?.nombre || 'Imagen del producto'"
+            @file-change="uploadImage"
+          />
+        </div>
+        
+        <div class="flex space-x-3 mt-6">
+          <button
+            @click="showUploadModal = false"
+            class="btn-restaurant-secondary flex-1"
+          >
+            Cancelar
+          </button>
+          <button
+            :disabled="uploading"
+            @click="showUploadModal = false"
+            class="btn-restaurant flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+          >
+            <Upload v-if="!uploading" class="w-4 h-4 mr-2" />
+            <span v-else>Cargando...</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </AppLayout>
 </template>
 
@@ -300,9 +353,11 @@ import {
   List,
   Trash,
   Package,
-  Edit
+  Edit,
+  Upload
 } from 'lucide-vue-next'
 import ProductCard from '@/components/Productos/ProductCard.vue'
+import ImageUpload from '@/components/Productos/ImageUpload.vue'
 import type { Producto, Categoria } from '@/types/productos'
 import AppLayout from '@/layouts/AppLayout.vue'
 import type { BreadcrumbItem } from '@/types'
@@ -321,6 +376,9 @@ const currentPage = ref(1)
 const itemsPerPage = 12
 const showDeleteModal = ref(false)
 const productoToDelete = ref<Producto | null>(null)
+const showUploadModal = ref(false)
+const productoToUpload = ref<Producto | null>(null)
+const uploading = ref(false)
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -376,6 +434,15 @@ const visiblePages = computed(() => {
   return pages
 })
 
+const productoToUploadImageUrl = computed({
+  get: () => productoToUpload.value?.imagen_url || '',
+  set: (value: string) => {
+    if (productoToUpload.value) {
+      productoToUpload.value.imagen_url = value
+    }
+  }
+})
+
 const formatPrice = (price: any): string => {
   if (price === null || price === undefined || price === '') {
     return '0.00'
@@ -390,9 +457,18 @@ const formatPrice = (price: any): string => {
   return numPrice.toFixed(2)
 }
 
+const editProduct = (producto: Producto) => {
+  router.visit(route('productos.edit', producto.id))
+}
+
 const confirmDelete = (producto: Producto) => {
   productoToDelete.value = producto
   showDeleteModal.value = true
+}
+
+const openUploadModal = (producto: Producto) => {
+  productoToUpload.value = producto
+  showUploadModal.value = true
 }
 
 const deleteProduct = () => {
@@ -404,6 +480,32 @@ const deleteProduct = () => {
       },
     })
   }
+}
+
+const uploadImage = (file: File) => {
+  if (!productoToUpload.value) return
+
+  uploading.value = true
+  const formData = new FormData()
+  formData.append('imagen', file)
+
+  router.post(route('productos.upload-image', productoToUpload.value.id), formData, {
+    onSuccess: (page) => {
+      console.log('Image upload successful', page)
+      showUploadModal.value = false
+      productoToUpload.value = null
+      uploading.value = false
+      // Recargar los productos si es necesario
+      router.reload({ only: ['productos'] })
+    },
+    onError: (errors) => {
+      console.error('Image upload failed:', errors)
+      uploading.value = false
+    },
+    onFinish: () => {
+      uploading.value = false
+    }
+  })
 }
 
 // Reset to first page when filters change

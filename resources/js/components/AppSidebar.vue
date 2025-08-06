@@ -13,8 +13,8 @@ import {
   SidebarMenuButton,
 } from '@/components/ui/sidebar'
 import AppLogo from './AppLogo.vue'
-import { mainNavItems, productNavItems, managementNavItems, reportsNavItems, configNavItems } from '@/config/navigation'
-import { Github, FileText } from 'lucide-vue-next'
+import { mainNavItems, productNavItems, userNavItems, managementNavItems, reportsNavItems, configNavItems } from '@/config/navigation'
+import { Github, FileText, User, LogOut } from 'lucide-vue-next'
 
 const page = usePage()
 
@@ -38,6 +38,23 @@ const isActive = (href: string) => {
         </SidebarGroupLabel>
         <SidebarMenu>
           <SidebarMenuItem v-for="item in mainNavItems" :key="item.href">
+            <Link :href="item.href" class="w-full">
+              <SidebarMenuButton :active="isActive(item.href)">
+                <component :is="item.icon" class="w-4 h-4" />
+                {{ item.title }}
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarGroup>
+
+      <!-- User Management Section -->
+      <SidebarGroup>
+        <SidebarGroupLabel class="text-xs font-semibold text-orange-700 dark:text-orange-300 uppercase tracking-wider px-4 mb-2">
+          Gestión de Usuarios
+        </SidebarGroupLabel>
+        <SidebarMenu>
+          <SidebarMenuItem v-for="item in userNavItems" :key="item.href">
             <Link :href="item.href" class="w-full">
               <SidebarMenuButton :active="isActive(item.href)">
                 <component :is="item.icon" class="w-4 h-4" />
@@ -110,6 +127,31 @@ const isActive = (href: string) => {
               <SidebarMenuButton :active="isActive(item.href)">
                 <component :is="item.icon" class="w-4 h-4" />
                 {{ item.title }}
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarGroup>
+
+      <!-- User Menu Section -->
+      <SidebarGroup>
+        <SidebarGroupLabel class="text-xs font-semibold text-orange-700 dark:text-orange-300 uppercase tracking-wider px-4 mb-2">
+          Mi Cuenta
+        </SidebarGroupLabel>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <Link :href="route('profile.edit')" class="w-full">
+              <SidebarMenuButton :active="isActive('/settings/profile')">
+                <User class="w-4 h-4" />
+                Perfil
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Link :href="route('logout')" method="post" as="button" class="w-full">
+              <SidebarMenuButton>
+                <LogOut class="w-4 h-4" />
+                Cerrar Sesión
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>

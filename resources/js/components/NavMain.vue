@@ -20,6 +20,16 @@ const isActive = (href: string) => {
         return true;
     }
     
+    // For user routes, check if we're in the users section
+    if (href.startsWith('/usuarios') && currentPath.startsWith('/usuarios')) {
+        return true;
+    }
+    
+    // For role routes, check if we're in the roles section
+    if (href.startsWith('/roles') && currentPath.startsWith('/roles')) {
+        return true;
+    }
+    
     return false;
 };
 </script>

@@ -14,6 +14,7 @@ class Rol extends Model
     
     protected $fillable = [
         'nombre',
+        'descripcion',
     ];
 
     /**
@@ -21,6 +22,14 @@ class Rol extends Model
      */
     public function usuarios()
     {
-        return $this->hasMany(Usuario::class, 'rol_id');
+        return $this->hasMany(User::class, 'rol_id');
+    }
+
+    /**
+     * Get the permisos for this role.
+     */
+    public function permisos()
+    {
+        return $this->belongsToMany(Permiso::class, 'rol_permiso', 'rol_id', 'permiso_id');
     }
 } 

@@ -16,8 +16,10 @@ return new class extends Migration
             $table->foreignId('pedido_id')->constrained('pedidos');
             $table->decimal('monto', 12, 2);
             $table->timestamp('fecha');
-            $table->foreignId('metodo_pago_id')->constrained('metodos_pago');
-            $table->foreignId('estado_pago_id')->constrained('estados_pago');
+            $table->unsignedSmallInteger('metodo_pago_id');
+            $table->foreign('metodo_pago_id')->references('id')->on('metodos_pago');
+            $table->unsignedSmallInteger('estado_pago_id');
+            $table->foreign('estado_pago_id')->references('id')->on('estados_pago');
             $table->string('referencia_externa', 100)->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -167,4 +167,37 @@ class ProductoController extends Controller
         return redirect()->route('productos.index')
             ->with('success', 'Producto eliminado exitosamente.');
     }
+
+    /**
+     * Upload image for existing product.
+     */
+    public function uploadImage(Request $request, Producto $producto)
+    {
+        $request->validate([
+            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Eliminar imagen anterior si existe
+        if ($producto->imagen_url) {
+            $oldPath = str_replace('/storage/', '', $producto->imagen_url);
+            Storage::disk('public')->delete($oldPath);
+        }
+
+        // Subir nueva imagen
+        $imagenPath = $request->file('imagen')->store('productos', 'public');
+        $producto->update([
+            'imagen_url' => Storage::url($imagenPath)
+        ]);
+
+        // Verificar si es una petición AJAX/Inertia
+        if ($request->wantsJson() || $request->header('X-Inertia')) {
+            return back()->with('success', 'Imagen subida exitosamente');
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Imagen subida exitosamente',
+            'imagen_url' => Storage::url($imagenPath)
+        ]);
+    }
 } 

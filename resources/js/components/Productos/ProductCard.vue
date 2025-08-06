@@ -3,7 +3,7 @@
     <!-- Image Container -->
     <div class="food-image-container aspect-square">
       <img
-        v-if="producto.imagen_url"
+        v-if="producto.imagen_url && producto.imagen_url.trim() !== '' && !imageError"
         :src="producto.imagen_url"
         :alt="producto.nombre"
         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
@@ -11,7 +11,7 @@
       />
       <div
         v-else
-        class="w-full h-full flex items-center justify-center"
+        class="w-full h-full flex items-center justify-center bg-orange-50 dark:bg-orange-900/20"
       >
         <div class="text-center">
           <Package class="w-16 h-16 text-orange-400 mx-auto mb-2" />
@@ -35,6 +35,13 @@
             title="Editar"
           >
             <Edit class="w-4 h-4 text-orange-600 dark:text-orange-400" />
+          </button>
+          <button
+            @click="$emit('upload-image', producto)"
+            class="p-2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 transform hover:scale-110"
+            title="Subir imagen"
+          >
+            <Upload class="w-4 h-4 text-blue-500" />
           </button>
           <button
             @click="$emit('delete', producto)"
@@ -103,7 +110,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Link } from '@inertiajs/vue3'
-import { Package, Edit, Trash, ArrowRight } from 'lucide-vue-next'
+import { Package, Edit, Trash, ArrowRight, Upload } from 'lucide-vue-next'
 import type { Producto } from '@/types/productos'
 
 interface Props {
@@ -113,15 +120,45 @@ interface Props {
 interface Emits {
   (e: 'edit', producto: Producto): void
   (e: 'delete', producto: Producto): void
+  (e: 'upload-image', producto: Producto): void
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 defineEmits<Emits>()
 
 const imageError = ref(false)
+const retryCount = ref(0)
+const maxRetries = 2
 
-const handleImageError = () => {
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement
+  retryCount.value++
+  
+  // Si no hemos alcanzado el máximo de reintentos, intentar recargar
+  if (retryCount.value <= maxRetries && props.producto.imagen_url) {
+    console.log(`Retrying image load for ${props.producto.nombre} (attempt ${retryCount.value}/${maxRetries})`)
+    setTimeout(() => {
+      img.src = props.producto.imagen_url + `&retry=${retryCount.value}`
+    }, 1000 * retryCount.value) // Delay incremental
+    return
+  }
+  
+  // Solo mostrar warning después de agotar los reintentos
+  if (props.producto.imagen_url) {
+    console.warn(`Failed to load image for product: ${props.producto.nombre} after ${maxRetries} retries - URL: ${props.producto.imagen_url}`)
+  }
+  
   imageError.value = true
+  
+  // Cargar imagen placeholder como último recurso
+  if (props.producto.imagen_url) {
+    const fallbackUrl = `https://via.placeholder.com/400x400/f97316/ffffff?text=${encodeURIComponent(props.producto.nombre)}`
+    setTimeout(() => {
+      if (imageError.value && img.src !== fallbackUrl) {
+        img.src = fallbackUrl
+      }
+    }, 500)
+  }
 }
 
 const formatPrice = (price: any): string => {
@@ -152,6 +189,7 @@ const formatDate = (dateString: string): string => {
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

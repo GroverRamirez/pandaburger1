@@ -8,7 +8,10 @@ import {
     CreditCard,
     Settings,
     BarChart3,
-    FileText
+    FileText,
+    Shield,
+    UserCheck,
+    Key
 } from 'lucide-vue-next';
 import type { NavItem } from '@/types';
 
@@ -35,6 +38,24 @@ export const productNavItems: NavItem[] = [
         title: 'Crear Producto',
         href: '/productos/create',
         icon: Plus,
+    },
+];
+
+export const userNavItems: NavItem[] = [
+    {
+        title: 'Usuarios',
+        href: '/usuarios',
+        icon: Users,
+    },
+    {
+        title: 'Roles',
+        href: '/roles',
+        icon: Shield,
+    },
+    {
+        title: 'Mi Perfil',
+        href: '/profile',
+        icon: UserCheck,
     },
 ];
 

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('estados_pago', function (Blueprint $table) {
             $table->smallIncrements('id');
             $table->string('nombre', 40);
+            $table->timestamps();
         });
     }
 
