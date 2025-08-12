@@ -21,7 +21,7 @@
                 </div>
                 <div class="flex items-center space-x-2 bg-white/20 rounded-full px-4 py-2">
                   <span class="text-orange-100">💰</span>
-                  <span class="text-white font-medium">${{ formatPrice(producto.precio) }}</span>
+                  <span class="text-white font-medium">{{ formatPrice(producto.precio) }}</span>
                 </div>
               </div>
             </div>
@@ -129,7 +129,7 @@
                     
                     <div class="flex items-center justify-between p-3 bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 rounded-xl border border-yellow-200 dark:border-yellow-800">
                       <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Precio:</span>
-                      <span class="price-display">${{ formatPrice(producto.precio) }}</span>
+                      <span class="price-display">{{ formatPrice(producto.precio) }}</span>
                     </div>
                     
                     <div v-if="producto.descripcion" class="p-3 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl border border-blue-200 dark:border-blue-800">
@@ -223,16 +223,19 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const formatPrice = (price: any): string => {
   if (price === null || price === undefined || price === '') {
-    return '0.00'
+    return 'Bs 0.00'
   }
   
   const numPrice = parseFloat(price)
   
   if (isNaN(numPrice)) {
-    return '0.00'
+    return 'Bs 0.00'
   }
   
-  return numPrice.toFixed(2)
+  return new Intl.NumberFormat('es-BO', {
+    style: 'currency',
+    currency: 'BOB'
+  }).format(numPrice)
 }
 
 const handleSubmit = (formData: FormData) => {

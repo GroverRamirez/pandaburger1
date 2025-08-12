@@ -78,7 +78,7 @@
       <div class="flex items-center justify-between">
         <div class="flex items-baseline space-x-1">
           <span class="price-display">
-            ${{ formatPrice(producto.precio) }}
+            {{ formatPrice(producto.precio) }}
           </span>
         </div>
         
@@ -163,16 +163,19 @@ const handleImageError = (event: Event) => {
 
 const formatPrice = (price: any): string => {
   if (price === null || price === undefined || price === '') {
-    return '0.00'
+    return 'Bs 0.00'
   }
   
   const numPrice = parseFloat(price)
   
   if (isNaN(numPrice)) {
-    return '0.00'
+    return 'Bs 0.00'
   }
   
-  return numPrice.toFixed(2)
+  return new Intl.NumberFormat('es-BO', {
+    style: 'currency',
+    currency: 'BOB'
+  }).format(numPrice)
 }
 
 const formatDate = (dateString: string): string => {

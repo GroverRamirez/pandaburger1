@@ -80,7 +80,7 @@
                 
                 <div class="flex items-center justify-between">
                   <span class="text-gray-600 dark:text-gray-400 font-medium">Precio:</span>
-                  <span class="price-display text-3xl">${{ formatPrice(producto.precio) }}</span>
+                  <span class="price-display text-3xl">{{ formatPrice(producto.precio) }}</span>
                 </div>
                 
                 <div v-if="producto.descripcion" class="pt-4 border-t border-orange-200 dark:border-orange-800">
@@ -236,16 +236,19 @@ const confirmDelete = () => {
 
 const formatPrice = (price: any): string => {
   if (price === null || price === undefined || price === '') {
-    return '0.00'
+    return 'Bs 0.00'
   }
   
   const numPrice = parseFloat(price)
   
   if (isNaN(numPrice)) {
-    return '0.00'
+    return 'Bs 0.00'
   }
   
-  return numPrice.toFixed(2)
+  return new Intl.NumberFormat('es-BO', {
+    style: 'currency',
+    currency: 'BOB'
+  }).format(numPrice)
 }
 
 const formatDate = (date: string): string => {

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\Web\HomeController;
 use App\Http\Controllers\Web\ProductoController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -17,14 +18,10 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+Route::get('/productos/categoria/{categoriaId}', [HomeController::class, 'productosPorCategoria'])
+    ->name('productos.por-categoria');
 
 Route::get('/test', function () {
     return Inertia::render('Test');

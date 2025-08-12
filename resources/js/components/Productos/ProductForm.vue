@@ -116,7 +116,7 @@
         </label>
       </div>
       <div class="relative">
-        <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold">$</span>
+        <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-semibold">Bs</span>
         <input
           id="precio"
           v-model="form.precio"

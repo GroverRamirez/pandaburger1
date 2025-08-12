@@ -151,7 +151,7 @@
                           {{ producto.categoria?.nombre }}
                         </span>
                         <span class="price-display text-xl">
-                          ${{ formatPrice(producto.precio) }}
+                          {{ formatPrice(producto.precio) }}
                         </span>
                       </div>
                     </div>
@@ -445,16 +445,19 @@ const productoToUploadImageUrl = computed({
 
 const formatPrice = (price: any): string => {
   if (price === null || price === undefined || price === '') {
-    return '0.00'
+    return 'Bs 0.00'
   }
   
   const numPrice = parseFloat(price)
   
   if (isNaN(numPrice)) {
-    return '0.00'
+    return 'Bs 0.00'
   }
   
-  return numPrice.toFixed(2)
+  return new Intl.NumberFormat('es-BO', {
+    style: 'currency',
+    currency: 'BOB'
+  }).format(numPrice)
 }
 
 const editProduct = (producto: Producto) => {

@@ -35,9 +35,9 @@ const stats = ref({
 })
 
 const formatPrice = (price: number): string => {
-  return price.toLocaleString('es-ES', {
+  return price.toLocaleString('es-BO', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'BOB',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
   })
@@ -148,7 +148,7 @@ onMounted(() => {
                     Ventas del Mes
                   </p>
                   <p class="text-3xl font-bold text-gray-900 dark:text-white">
-                    ${{ formatPrice(stats.ventasMes) }}
+                    {{ formatPrice(stats.ventasMes) }}
                   </p>
                 </div>
                 <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -315,7 +315,7 @@ onMounted(() => {
                       Hamburguesa Doble
                     </p>
                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                      $12.00 - 45 ventas
+                      Bs 12.00 - 45 ventas
                     </p>
                   </div>
                   <div class="text-right">
@@ -334,7 +334,7 @@ onMounted(() => {
                       Coca Cola
                     </p>
                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                      $2.50 - 32 ventas
+                      Bs 2.50 - 32 ventas
                     </p>
                   </div>
                   <div class="text-right">
@@ -353,7 +353,7 @@ onMounted(() => {
                       Papas Fritas
                     </p>
                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                      $3.50 - 28 ventas
+                      Bs 3.50 - 28 ventas
                     </p>
                   </div>
                   <div class="text-right">
@@ -388,7 +388,7 @@ onMounted(() => {
                   <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3">
                     <DollarSign class="w-6 h-6 text-white" />
                   </div>
-                  <p class="text-2xl font-bold text-gray-900 dark:text-white">$2,450</p>
+                  <p class="text-2xl font-bold text-gray-900 dark:text-white">Bs 2,450</p>
                   <p class="text-sm text-gray-600 dark:text-gray-400">Ingresos Hoy</p>
                 </div>
                 
