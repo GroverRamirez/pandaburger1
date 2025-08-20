@@ -34,4 +34,6 @@ Route::get('/dashboard', function () {
 require __DIR__.'/auth.php';
 require __DIR__.'/productos.php';
 require __DIR__.'/usuarios.php';
+require __DIR__.'/clientes.php';
+require __DIR__.'/pedidos.php';
 require __DIR__.'/settings.php';

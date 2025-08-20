@@ -56,6 +56,14 @@ class Pedido extends Model
     }
 
     /**
+     * Alias for detallesPedido to maintain compatibility.
+     */
+    public function detalles()
+    {
+        return $this->detallesPedido();
+    }
+
+    /**
      * Get the payments for this order.
      */
     public function pagos()

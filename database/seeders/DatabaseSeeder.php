@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             EstadoPagoSeeder::class,
             MetodoPagoSeeder::class,
             CategoriaSeeder::class,
+            ClienteSeeder::class,
+            PedidoSeeder::class,
         ]);
 
         // Create a default admin user

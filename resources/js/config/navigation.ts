@@ -26,6 +26,11 @@ export const mainNavItems: NavItem[] = [
         href: '/productos',
         icon: Package,
     },
+    {
+        title: 'Clientes',
+        href: '/clientes',
+        icon: Users,
+    },
 ];
 
 export const productNavItems: NavItem[] = [

@@ -14,15 +14,47 @@ class EstadoPedidoSeeder extends Seeder
     public function run(): void
     {
         $estados = [
-            ['nombre' => 'Pendiente'],
-            ['nombre' => 'En Preparación'],
-            ['nombre' => 'Listo'],
-            ['nombre' => 'Entregado'],
-            ['nombre' => 'Cancelado'],
+            [
+                'id' => 1,
+                'nombre' => 'Pendiente',
+                'color' => '#F59E0B',
+                'icon' => 'clock'
+            ],
+            [
+                'id' => 2,
+                'nombre' => 'En Proceso',
+                'color' => '#3B82F6',
+                'icon' => 'alert-circle'
+            ],
+            [
+                'id' => 3,
+                'nombre' => 'Completado',
+                'color' => '#10B981',
+                'icon' => 'check-circle'
+            ],
+            [
+                'id' => 4,
+                'nombre' => 'Cancelado',
+                'color' => '#EF4444',
+                'icon' => 'x-circle'
+            ],
+            [
+                'id' => 5,
+                'nombre' => 'Entregado',
+                'color' => '#8B5CF6',
+                'icon' => 'truck'
+            ]
         ];
 
         foreach ($estados as $estado) {
-            EstadoPedido::create($estado);
+            EstadoPedido::updateOrCreate(
+                ['id' => $estado['id']],
+                [
+                    'nombre' => $estado['nombre'],
+                    'color' => $estado['color'],
+                    'icon' => $estado['icon']
+                ]
+            );
         }
     }
 } 

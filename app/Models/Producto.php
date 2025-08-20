@@ -39,4 +39,20 @@ class Producto extends Model
     {
         return $this->hasMany(DetallePedido::class, 'producto_id');
     }
+
+    /**
+     * Get the category name for compatibility.
+     */
+    public function getCategoriaAttribute()
+    {
+        return $this->categoria()->first()?->nombre ?? '';
+    }
+
+    /**
+     * Get stock disponible for compatibility (default to 100 if not exists).
+     */
+    public function getStockDisponibleAttribute()
+    {
+        return 100; // Default value for compatibility
+    }
 } 

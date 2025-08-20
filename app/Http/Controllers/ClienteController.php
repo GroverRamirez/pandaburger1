@@ -6,16 +6,81 @@ use App\Models\Cliente;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Inertia\Inertia;
 
 class ClienteController extends Controller
 {
     /**
+     * Display a listing of clients.
+     */
+    public function index()
+    {
+        return Inertia::render('Clientes/Index');
+    }
+
+    /**
+     * Show the form for creating a new client.
+     */
+    public function create()
+    {
+        return Inertia::render('Clientes/Create');
+    }
+
+    /**
+     * Display the specified client.
+     */
+    public function show(Cliente $cliente)
+    {
+        return Inertia::render('Clientes/Show', [
+            'cliente' => $cliente->load('pedidos.estado')
+        ]);
+    }
+
+    /**
+     * Show the form for editing the specified client.
+     */
+    public function edit(Cliente $cliente)
+    {
+        return Inertia::render('Clientes/Edit', [
+            'cliente' => $cliente
+        ]);
+    }
+
+    /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    /**
+     * API: Get all clients with pagination and filtering
+     */
+    public function indexApi(Request $request): JsonResponse
     {
-        $clientes = Cliente::all();
-        return response()->json($clientes);
+        $query = Cliente::query();
+
+        // Apply search filter
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where('nombre', 'like', "%{$search}%")
+                  ->orWhere('correo_electronico', 'like', "%{$search}%");
+        }
+
+        // Apply sorting
+        $sortBy = $request->input('sort_by', 'nombre');
+        $sortOrder = $request->input('sort_order', 'asc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        // Paginate results
+        $perPage = $request->input('per_page', 10);
+        $clientes = $query->paginate($perPage);
+
+        return response()->json([
+            'data' => $clientes->items(),
+            'meta' => [
+                'total' => $clientes->total(),
+                'per_page' => $clientes->perPage(),
+                'current_page' => $clientes->currentPage(),
+                'last_page' => $clientes->lastPage(),
+            ]
+        ]);
     }
 
     /**
@@ -41,11 +106,11 @@ class ClienteController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * API: Get client details
      */
-    public function show(Cliente $cliente): JsonResponse
+    public function getClient(Cliente $cliente): JsonResponse
     {
-        return response()->json($cliente);
+        return response()->json($cliente->load('pedidos.estado'));
     }
 
     /**
@@ -85,6 +150,6 @@ class ClienteController extends Controller
     public function orders(Cliente $cliente): JsonResponse
     {
         $cliente->load('pedidos.estado');
-        return response()->json($cliente->pedidos);
+        return response()->json(['data' => $cliente->pedidos]);
     }
 } 
