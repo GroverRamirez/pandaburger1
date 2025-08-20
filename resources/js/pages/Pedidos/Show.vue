@@ -37,6 +37,7 @@ const props = defineProps<{
 
 const pedido = ref<PedidoWithDetails | null>(null);
 const isLoading = ref(true);
+const error = ref<string | null>(null);
 const showTimeline = ref(true);
 const showDetails = ref(true);
 const showProducts = ref(true);
@@ -44,10 +45,21 @@ const showActions = ref(true);
 
 const fetchPedido = async () => {
   try {
+    error.value = null;
+    console.log('Fetching pedido with ID:', props.pedidoId);
     const pedidoData = await pedidoService.getPedidoWithDetails(parseInt(props.pedidoId));
+    console.log('Pedido data received:', pedidoData);
     pedido.value = pedidoData;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching order:', error);
+    console.error('Error details:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+      url: error.config?.url
+    });
+    
+    error.value = `Error al cargar el pedido: ${error.response?.status || 'Desconocido'} - ${error.message || 'Error de conexión'}`;
   } finally {
     isLoading.value = false;
   }
@@ -122,16 +134,19 @@ const formatCurrency = (amount: number) => {
 };
 
 const printPedido = () => {
+  if (!pedido.value) return;
   window.print();
 };
 
 const exportPedido = async (format: 'pdf' | 'excel' = 'pdf') => {
+  if (!pedido.value) return;
+  
   try {
     const blob = await pedidoService.exportPedidos({}, format);
-    const url = window.URL.createObjectURL(blob);
+    const url = window.URL.createObjectURL(blob as Blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `pedido-${pedido.value?.id}-${new Date().toISOString().split('T')[0]}.${format}`;
+    a.download = `pedido-${pedido.value.id}-${new Date().toISOString().split('T')[0]}.${format}`;
     a.click();
     window.URL.revokeObjectURL(url);
   } catch (error) {
@@ -160,7 +175,7 @@ onMounted(() => {
               </Link>
               <div>
                 <h1 class="text-4xl font-bold text-gradient mb-2">
-                  🛒 Pedido #{{ pedido?.id }}
+                  🛒 Pedido #{{ pedido ? pedido.id : '...' }}
                 </h1>
                 <p class="text-lg text-gray-600 dark:text-gray-400">
                   Detalles completos del pedido
@@ -169,6 +184,7 @@ onMounted(() => {
             </div>
             <div class="flex items-center space-x-3">
               <button
+                v-if="pedido"
                 @click="exportPedido('pdf')"
                 class="btn-restaurant-secondary inline-flex items-center"
               >
@@ -176,13 +192,14 @@ onMounted(() => {
                 PDF
               </button>
               <button
+                v-if="pedido"
                 @click="printPedido"
                 class="btn-restaurant-secondary inline-flex items-center"
               >
                 <Printer class="w-4 h-4 mr-2" />
                 Imprimir
               </button>
-              <Link :href="route('pedidos.edit', pedido?.id)">
+              <Link v-if="pedido" :href="route('pedidos.edit', pedido.id)">
                 <button class="btn-restaurant inline-flex items-center">
                   <Edit class="w-4 h-4 mr-2" />
                   Editar
@@ -201,6 +218,20 @@ onMounted(() => {
           </div>
           <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">Cargando pedido...</h3>
           <p class="text-gray-600 dark:text-gray-400">Por favor espera un momento</p>
+        </div>
+
+        <div v-else-if="error" class="text-center py-12">
+          <div class="w-24 h-24 mx-auto mb-4 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+            <XCircle class="w-12 h-12 text-red-500" />
+          </div>
+          <h3 class="text-lg font-medium text-red-900 dark:text-red-100 mb-2">Error al cargar el pedido</h3>
+          <p class="text-red-600 dark:text-red-400 mb-4">{{ error }}</p>
+          <button 
+            @click="fetchPedido" 
+            class="btn-restaurant-primary"
+          >
+            Reintentar
+          </button>
         </div>
 
         <div v-else-if="pedido" class="space-y-6">

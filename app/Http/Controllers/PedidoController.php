@@ -114,16 +114,16 @@ class PedidoController extends Controller
      */
     public function showWithDetails($id): JsonResponse
     {
-        $pedido = Pedido::with(['estado', 'cliente', 'usuario', 'detalles.producto'])->findOrFail($id);
+        $pedido = Pedido::with(['estado', 'cliente', 'usuario', 'detallesPedido.producto'])->findOrFail($id);
         
         // Calcular estadísticas
         $estadisticas = [
-            'total_productos' => $pedido->detalles->count(),
-            'total_items' => $pedido->detalles->sum('cantidad'),
-            'total_pedido' => $pedido->detalles->sum('precio_total'),
-            'impuestos' => $pedido->detalles->sum('precio_total') * 0.13,
+            'total_productos' => $pedido->detallesPedido->count(),
+            'total_items' => $pedido->detallesPedido->sum('cantidad'),
+            'total_pedido' => $pedido->detallesPedido->sum('precio_total'),
+            'impuestos' => $pedido->detallesPedido->sum('precio_total') * 0.13,
             'descuentos' => 0,
-            'total_final' => $pedido->detalles->sum('precio_total') * 1.13
+            'total_final' => $pedido->detallesPedido->sum('precio_total') * 1.13
         ];
 
         // Generar timeline

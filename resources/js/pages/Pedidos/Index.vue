@@ -75,6 +75,20 @@ const filters = ref<PedidoFilters>({
 const showFilters = ref(false);
 const showAdvancedFilters = ref(false);
 
+// Función para calcular páginas visibles en la paginación
+const visiblePages = computed(() => {
+  const pages = []
+  const maxVisible = 5
+  const start = Math.max(1, currentPage.value - Math.floor(maxVisible / 2))
+  const end = Math.min(totalPages.value, start + maxVisible - 1)
+  
+  for (let i = start; i <= end; i++) {
+    pages.push(i)
+  }
+  
+  return pages
+})
+
 const fetchPedidos = async () => {
   isLoading.value = true;
   try {
@@ -621,107 +635,101 @@ onMounted(async () => {
         <!-- Orders Table -->
         <div v-if="pedidos && pedidos.length > 0">
           <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-orange-200 dark:border-orange-800 overflow-hidden">
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-orange-200 dark:divide-orange-800">
+            <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-orange-300 scrollbar-track-gray-100 dark:scrollbar-thumb-orange-600 dark:scrollbar-track-gray-700">
+              <table class="orders-table w-full table-fixed divide-y divide-orange-200 dark:divide-orange-800">
                 <thead class="bg-orange-50 dark:bg-orange-900/20">
                   <tr>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-orange-800 dark:text-orange-200 uppercase tracking-wider">
+                    <th class="w-32 px-3 py-4 text-left text-xs font-bold text-orange-800 dark:text-orange-200 uppercase tracking-wider">
                       Pedido
                     </th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-orange-800 dark:text-orange-200 uppercase tracking-wider">
+                    <th class="w-44 px-3 py-4 text-left text-xs font-bold text-orange-800 dark:text-orange-200 uppercase tracking-wider">
                       Cliente
                     </th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-orange-800 dark:text-orange-200 uppercase tracking-wider">
+                    <th class="w-36 px-3 py-4 text-left text-xs font-bold text-orange-800 dark:text-orange-200 uppercase tracking-wider">
                       Estado
                     </th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-orange-800 dark:text-orange-200 uppercase tracking-wider">
+                    <th class="w-28 px-3 py-4 text-left text-xs font-bold text-orange-800 dark:text-orange-200 uppercase tracking-wider">
                       Productos
                     </th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-orange-800 dark:text-orange-200 uppercase tracking-wider">
+                    <th class="w-28 px-3 py-4 text-left text-xs font-bold text-orange-800 dark:text-orange-200 uppercase tracking-wider">
                       Total
                     </th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-orange-800 dark:text-orange-200 uppercase tracking-wider">
+                    <th class="w-36 px-3 py-4 text-left text-xs font-bold text-orange-800 dark:text-orange-200 uppercase tracking-wider">
                       Fecha
                     </th>
-                    <th class="px-6 py-4 text-left text-xs font-bold text-orange-800 dark:text-orange-200 uppercase tracking-wider">
+                    <th class="w-60 px-3 py-4 text-left text-xs font-bold text-orange-800 dark:text-orange-200 uppercase tracking-wider">
                       Acciones
                     </th>
                   </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-orange-100 dark:divide-orange-800">
                   <tr v-for="pedido in pedidos" :key="pedido.id" class="hover:bg-orange-50 dark:hover:bg-orange-900/10 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div class="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
-                          <span class="text-sm font-bold text-orange-800 dark:text-orange-200">
+                    <td class="w-32 px-3 py-4">
+                      <div class="flex items-center justify-center">
+                        <div class="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+                          <span class="text-xs font-bold text-orange-800 dark:text-orange-200">
                             #{{ pedido.id }}
                           </span>
                         </div>
-                        <div class="ml-4">
-                          <div class="text-sm font-bold text-gray-900 dark:text-white">
-                            Pedido #{{ pedido.id }}
-                          </div>
-                          <div class="text-sm text-gray-600 dark:text-gray-400">
-                            {{ pedido.usuario_nombre || 'Sin usuario' }}
-                          </div>
-                        </div>
                       </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="w-44 px-3 py-4">
                       <div class="flex items-center">
-                        <User class="w-4 h-4 mr-2 text-orange-500" />
-                        <span class="text-sm text-gray-900 dark:text-white">
+                        <User class="w-4 h-4 mr-2 text-orange-500 flex-shrink-0" />
+                        <span class="text-sm text-gray-900 dark:text-white truncate">
                           {{ pedido.cliente_nombre || 'Sin cliente' }}
                         </span>
                       </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
+                    <td class="w-36 px-3 py-4">
                       <span
                         :class="[
-                          'inline-flex items-center px-3 py-1 rounded-full text-xs font-bold',
+                          'inline-flex items-center px-2 py-1 rounded-full text-xs font-bold whitespace-nowrap',
                           getEstadoColor(pedido.estado_nombre)
                         ]"
                       >
-                        <component :is="getEstadoIcon(pedido.estado_nombre)" class="w-3 h-3 mr-1" />
-                        {{ pedido.estado_nombre }}
+                        <component :is="getEstadoIcon(pedido.estado_nombre)" class="w-3 h-3 mr-1 flex-shrink-0" />
+                        <span class="truncate">{{ pedido.estado_nombre }}</span>
                       </span>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                        <Package class="w-4 h-4 mr-2 text-orange-500" />
-                        {{ pedido.total_items || 0 }} productos
+                    <td class="w-28 px-3 py-4">
+                      <div class="flex items-center justify-center text-sm text-gray-600 dark:text-gray-400">
+                        <Package class="w-4 h-4 mr-1 text-orange-500 flex-shrink-0" />
+                        <span class="truncate">{{ pedido.total_items || 0 }}</span>
                       </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm font-bold text-gray-900 dark:text-white">
+                    <td class="w-28 px-3 py-4">
+                      <div class="text-sm font-bold text-gray-900 dark:text-white truncate text-center">
                         {{ formatCurrency(pedido.total_pedido || 0) }}
                       </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                    <td class="w-36 px-3 py-4">
                       <div class="flex items-center">
-                        <Calendar class="w-4 h-4 mr-2 text-orange-500" />
-                        {{ formatDate(pedido.fecha) }}
+                        <Calendar class="w-4 h-4 mr-2 text-orange-500 flex-shrink-0" />
+                        <span class="text-xs text-gray-600 dark:text-gray-400 truncate">
+                          {{ formatDate(pedido.fecha) }}
+                        </span>
                       </div>
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div class="flex items-center space-x-2">
+                    <td class="w-60 px-3 py-4">
+                      <div class="flex items-center justify-start space-x-1">
                         <Link :href="route('pedidos.show', pedido.id)">
-                          <button class="btn-restaurant-secondary">
-                            <Eye class="w-4 h-4 mr-1" />
+                          <button class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors whitespace-nowrap">
+                            <Eye class="w-3 h-3 mr-1" />
                             Ver
                           </button>
                         </Link>
                         <Link :href="route('pedidos.edit', pedido.id)">
-                          <button class="btn-restaurant-secondary">
-                            <Edit class="w-4 h-4 mr-1" />
+                          <button class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors whitespace-nowrap">
+                            <Edit class="w-3 h-3 mr-1" />
                             Editar
                           </button>
                         </Link>
                         <button
                           @click="deletePedido(pedido.id)"
-                          class="btn-restaurant-secondary text-red-600 hover:text-red-700"
+                          class="inline-flex items-center px-3 py-1.5 border border-red-600 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors whitespace-nowrap"
                         >
-                          <Trash2 class="w-4 h-4 mr-1" />
+                          <Trash2 class="w-3 h-3 mr-1" />
                           Eliminar
                         </button>
                       </div>
@@ -758,35 +766,110 @@ onMounted(async () => {
         </div>
 
         <!-- Pagination -->
-        <div class="mt-8 flex items-center justify-center space-x-2">
-          <button
-            @click="handlePageChange(currentPage - 1)"
-            :disabled="currentPage === 1"
-            class="btn-restaurant-secondary disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Anterior
-          </button>
+        <div v-if="totalPages > 1" class="bg-orange-50 dark:bg-orange-900/20 px-6 py-4 flex items-center justify-between border-t border-orange-200 dark:border-orange-800 rounded-b-lg">
+          <div class="flex items-center space-x-2">
+            <button
+              @click="handlePageChange(currentPage - 1)"
+              :disabled="currentPage === 1"
+              class="btn-restaurant-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Anterior
+            </button>
+            
+            <div class="flex items-center space-x-1">
+              <button
+                v-for="page in visiblePages"
+                :key="page"
+                @click="handlePageChange(page)"
+                :class="[
+                  'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                  page === currentPage
+                    ? 'bg-orange-600 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                ]"
+              >
+                {{ page }}
+              </button>
+            </div>
+            
+            <button
+              @click="handlePageChange(currentPage + 1)"
+              :disabled="currentPage === totalPages"
+              class="btn-restaurant-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Siguiente
+            </button>
+          </div>
           
-          <span class="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
-            Página {{ currentPage }} de {{ totalPages || 1 }}
-          </span>
-          
-          <button
-            @click="handlePageChange(currentPage + 1)"
-            :disabled="currentPage === (totalPages || 1)"
-            class="btn-restaurant-secondary disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Siguiente
-          </button>
-        </div>
-        
-        <!-- Pagination Info -->
-        <div class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
-          <span v-if="pedidos && pedidos.length > 0">
-            Mostrando {{ ((currentPage - 1) * (filters.perPage || 10)) + 1 }} - {{ Math.min(currentPage * (filters.perPage || 10), response?.meta?.total || pedidos.length) }} de {{ response?.meta?.total || pedidos.length }} pedidos
-          </span>
+          <!-- Pagination Info -->
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            <span v-if="pedidos && pedidos.length > 0">
+              Mostrando {{ ((currentPage - 1) * (filters.perPage || 10)) + 1 }} - {{ Math.min(currentPage * (filters.perPage || 10), response?.meta?.total || pedidos.length) }} de {{ response?.meta?.total || pedidos.length }} pedidos
+            </span>
+          </div>
         </div>
       </div>
     </div>
   </AppLayout>
 </template>
+
+<style scoped>
+/* Estilos personalizados para la tabla de pedidos */
+.orders-table {
+  min-width: 1100px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+  .orders-table {
+    min-width: 1000px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .orders-table {
+    min-width: 900px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .orders-table {
+    min-width: 800px;
+  }
+}
+
+/* Mejorar la legibilidad de las celdas */
+.table-cell {
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* Asegurar que los botones de acción no se compriman */
+.action-buttons {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Mejorar el scroll horizontal */
+.overflow-x-auto {
+  scrollbar-width: thin;
+}
+
+/* Estilos para mejor alineación */
+.orders-table th,
+.orders-table td {
+  vertical-align: middle;
+}
+
+/* Mejorar la compacidad de los botones */
+.orders-table .btn-restaurant-secondary {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  min-width: auto;
+}
+
+/* Centrar contenido en columnas numéricas */
+.orders-table .text-center {
+  text-align: center;
+}
+</style>

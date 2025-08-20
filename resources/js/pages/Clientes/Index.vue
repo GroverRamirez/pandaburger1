@@ -45,6 +45,23 @@ const sortBy = ref<'nombre' | 'correo_electronico' | 'created_at'>('nombre');
 const sortOrder = ref<'asc' | 'desc'>('asc');
 const statusFilter = ref<'all' | 'active' | 'inactive'>('all');
 
+// Variable para el total de clientes
+const totalClientes = ref(0);
+
+// Función para calcular páginas visibles en la paginación
+const visiblePages = computed(() => {
+  const pages = []
+  const maxVisible = 5
+  const start = Math.max(1, currentPage.value - Math.floor(maxVisible / 2))
+  const end = Math.min(totalPages.value, start + maxVisible - 1)
+  
+  for (let i = start; i <= end; i++) {
+    pages.push(i)
+  }
+  
+  return pages
+})
+
 const filters = computed<ClienteFilters>(() => ({
   search: searchTerm.value,
   sortBy: sortBy.value,
@@ -61,6 +78,9 @@ const fetchClientes = async () => {
     if (response.meta) {
       totalPages.value = response.meta.last_page;
       currentPage.value = response.meta.current_page;
+      totalClientes.value = response.meta.total;
+    } else {
+      totalClientes.value = clientes.value.length;
     }
   } catch (error) {
     console.error('Error fetching clients:', error);
@@ -374,7 +394,7 @@ onMounted(async () => {
                         </Link>
                         <button
                           @click="deleteCliente(cliente.id)"
-                          class="btn-restaurant-secondary text-red-600 hover:text-red-700"
+                          class="btn-restaurant bg-red-600 hover:bg-red-700"
                         >
                           Eliminar
                         </button>
@@ -403,26 +423,47 @@ onMounted(async () => {
         </div>
 
         <!-- Pagination -->
-        <div v-if="totalPages > 1" class="mt-8 flex items-center justify-center space-x-2">
-          <button
-            @click="handlePageChange(currentPage - 1)"
-            :disabled="currentPage === 1"
-            class="btn-restaurant-secondary disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Anterior
-          </button>
+        <div v-if="totalPages > 1" class="bg-orange-50 dark:bg-orange-900/20 px-6 py-4 flex items-center justify-between border-t border-orange-200 dark:border-orange-800 rounded-b-lg">
+          <div class="flex items-center space-x-2">
+            <button
+              @click="handlePageChange(currentPage - 1)"
+              :disabled="currentPage === 1"
+              class="btn-restaurant-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Anterior
+            </button>
+            
+            <div class="flex items-center space-x-1">
+              <button
+                v-for="page in visiblePages"
+                :key="page"
+                @click="handlePageChange(page)"
+                :class="[
+                  'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                  page === currentPage
+                    ? 'bg-orange-600 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                ]"
+              >
+                {{ page }}
+              </button>
+            </div>
+            
+            <button
+              @click="handlePageChange(currentPage + 1)"
+              :disabled="currentPage === totalPages"
+              class="btn-restaurant-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Siguiente
+            </button>
+          </div>
           
-          <span class="px-4 py-2 text-sm text-gray-600 dark:text-gray-400">
-            Página {{ currentPage }} de {{ totalPages }}
-          </span>
-          
-          <button
-            @click="handlePageChange(currentPage + 1)"
-            :disabled="currentPage === totalPages"
-            class="btn-restaurant-secondary disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Siguiente
-          </button>
+          <!-- Pagination Info -->
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            <span v-if="clientes && clientes.length > 0">
+              Mostrando {{ ((currentPage - 1) * (filters.perPage || 10)) + 1 }} - {{ Math.min(currentPage * (filters.perPage || 10), totalClientes || clientes.length) }} de {{ totalClientes || clientes.length }} clientes
+            </span>
+          </div>
         </div>
       </div>
     </div>
