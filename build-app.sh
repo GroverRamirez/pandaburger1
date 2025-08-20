@@ -1,22 +1,24 @@
-#!/usr/bin/env bash
+#!/bin/bash
 set -e
 
-# Instala dependencias de Laravel
-composer install --no-dev --optimize-autoloader
-
-# Compila assets si tienes Vite
-if [ -f package.json ]; then
-  npm ci || npm install
-  npm run build || true
+# — 0) Si falla npm ci (no hay package-lock), usa npm install
+if [ -f package-lock.json ]; then
+  npm ci
+else
+  npm install
 fi
 
-# Cachea configuración y rutas (no toca DB)
+# — 1) Compila assets (Vite)
+npm run build
+
+# — 2) Optimizaciones de Laravel
+php artisan optimize:clear
 php artisan config:cache
+php artisan event:cache
 php artisan route:cache
 php artisan view:cache
 
-# Enlaza storage
+# — 3) Enlace de storage (idempotente)
 php artisan storage:link || true
 
-echo "[build-app] OK"
 
