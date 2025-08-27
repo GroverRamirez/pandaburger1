@@ -1,48 +1,26 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -euo pipefail
 
-echo "🚀 Iniciando build de PandaBurger..."
-
-# — 0) Verificar que estamos en el directorio correcto
-if [ ! -f "composer.json" ]; then
-    echo "❌ Error: composer.json no encontrado. Asegúrate de estar en el directorio raíz del proyecto."
-    exit 1
+# Frontend (si usas Vite)
+if [ -f package.json ]; then
+  npm ci
+  npm run build
 fi
 
-# — 1) Instalar dependencias de PHP
-echo "📦 Instalando dependencias de PHP..."
-composer install --no-dev --optimize-autoloader --no-interaction
+# PHP deps sin dev y optimizado
+composer install --no-dev --prefer-dist --optimize-autoloader
 
-# — 2) Instalar dependencias de Node.js
-echo "📦 Instalando dependencias de Node.js..."
-if [ -f package-lock.json ]; then
-    npm ci --production
-else
-    npm install --production
-fi
-
-# — 3) Compilar assets (Vite)
-echo "🔨 Compilando assets con Vite..."
-npm run build
-
-# — 4) Limpiar cache de Laravel (sin base de datos)
-echo "🧹 Limpiando cache de Laravel..."
+# Limpiar y cachear LO QUE NO requiere DB
+php artisan route:clear || true
 php artisan config:clear || true
 php artisan view:clear || true
-php artisan route:clear || true
 php artisan event:clear || true
 
-# — 5) Optimizaciones de Laravel (sin base de datos)
-echo "⚡ Optimizando Laravel..."
-php artisan config:cache || true
-php artisan view:cache || true
-php artisan route:cache || true
-php artisan event:cache || true
+php artisan optimize
+php artisan config:cache
+php artisan view:cache
 
-# — 6) Verificar que la aplicación puede iniciar
-echo "✅ Verificando que la aplicación puede iniciar..."
-php artisan --version
-
-echo "🎉 Build completado exitosamente!"
+# Importante: NO migrate, NO seed, NO esperar MySQL aquí
+# Importante: NO route:cache aquí hasta que no haya duplicados de nombres
 
 
