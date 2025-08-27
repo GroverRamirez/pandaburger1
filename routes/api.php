@@ -68,7 +68,8 @@ Route::prefix('v1')->group(function () {
     Route::get('detalle-pedido/producto/{productoId}', [DetallePedidoController::class, 'byProduct']);
 
     // Products routes
-    Route::apiResource('productos', ProductoController::class);
+    Route::apiResource('productos', ProductoController::class)->except(['index']);
+    Route::get('productos', [ProductoController::class, 'index'])->name('productos.index');
     Route::get('productos/categoria/{categoriaId}', [ProductoController::class, 'byCategory']);
 
     // Categories routes
